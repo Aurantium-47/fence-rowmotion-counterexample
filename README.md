@@ -4,14 +4,23 @@ For the paper's fence `F̆(3^11)`, with 32 vertices and 11 segments, the lower i
 
 The parameter of each maximal-chain segment is its number of unshared vertices plus one. The explicit cover relations and the complete 237-state certificate appear in the manuscript.
 
+## Kernel verification update (2026-10-13)
+
+The new `kernel-candidate/` proof at [commit `743fb848aa94c16b51dde32db51710a6f9aff598`](https://github.com/Aurantium-47/fence-rowmotion-counterexample/commit/743fb848aa94c16b51dde32db51710a6f9aff598) passed [run 38384896313](https://github.com/Aurantium-47/fence-rowmotion-counterexample/actions/runs/38384896313). The actual logs confirm 39 newly compiled own source files, 39 imports from their new outputs, and complete types and transitive axiom lists for all 49 audited declarations, followed by successful final assertions. The final theorem `W04.paper_fence_counterexample` uses only `propext`, `Classical.choice`, and `Quot.sound`; the native-evaluation axiom `Lean.ofReduceBool` is absent.
+
+The finite certificates use `decide +kernel`. External dependencies still came from fixed precompiled caches; this is not a full dependency source rebuild or a check with an independent kernel implementation. See [kernel verification, trust boundary, and reproduction](verification/kernel_verification.md) for the exact scope and the preserved earlier failed run.
+
+The mathematical result is unchanged. The original `v0.1.0` release, fixed at `516b2b4ab803b9dee2796c22edf9e2d33014b5d6`, remains available. Its `lean/` proof, manuscript, Chinese summary, and `verification/lean_*` evidence describe the historical native-evaluation version. This update does not replace those release assets.
+
 ## Contents
 
 - `manuscript/main.pdf` and `manuscript/main.tex`: English short note, with the entire hexadecimal certificate in the appendix.
 - `中文简述.md`: Chinese explanation of the result and verification limits.
 - `data/orbit.csv`: all 237 ideals, cardinalities, maximal antichains, and masks.
 - `checker/check.py`: standalone standard-library Python checker.
-- `lean/`: the four unchanged proof modules, pinned versions, build script, and reproduction instructions.
-- `verification/`: actual checking output, Lean build log and axiom audit, and PDF checks.
+- `kernel-candidate/`: the later kernel-checked proof at the successful commit linked above.
+- `lean/`: the four historical native-evaluation proof modules, pinned versions, build script, and reproduction instructions.
+- `verification/kernel_verification.md`: the later kernel-verification result and reproduction procedure. Other saved verification files retain their original release scope.
 - `REFERENCES_AND_SCOPE.md` and `ATTRIBUTION.md`: sources, literature boundary, and attribution status.
 - `PUBLIC_FILES.txt`, `SHA256SUMS`, and `make_release.py`: exact distribution allowlist, hashes, and a local packaging script.
 
@@ -25,7 +34,7 @@ python checker/check.py
 
 The checker reads the distributed certificate, constructs the fence order from the directed path, and checks all ideal and rowmotion conditions, distinctness, closure, least period, sum, and agreement with the Lean literals. It uses exact integers and rational arithmetic.
 
-## Verify the Lean proof
+## Verify the historical v0.1.0 Lean proof
 
 See `lean/README.md`. Lean is fixed at 4.19.0 and mathlib at `c44e0c8ee63ca166450922a373c7409c5d26b00b`; all nine dependency revisions are locked. A conventional setup is:
 
@@ -37,7 +46,7 @@ lake build
 
 The actual local validation rebuilt all four modules with existing caches at the pinned revisions. Network acquisition and a clean-machine bootstrap were not tested. The portable PowerShell script can check and reuse an explicitly supplied cache read-only.
 
-**Trust boundary:** finite orbit certificates use `native_decide`. The final counterexample theorem depends on `propext`, `Classical.choice`, `Lean.ofReduceBool`, and `Quot.sound`. `Lean.ofReduceBool` adds trust in native evaluation and the Lean compiler. This is not a completed kernel-reduction-only proof. The final proof sources have no `sorry`, `admit`, or custom unproved mathematical axioms; the final axiom audit has no `sorryAx`.
+**Historical v0.1.0 trust boundary:** finite orbit certificates use `native_decide`. The final counterexample theorem depends on `propext`, `Classical.choice`, `Lean.ofReduceBool`, and `Quot.sound`. `Lean.ofReduceBool` adds trust in native evaluation and the Lean compiler. This is not a completed kernel-reduction-only proof. The final proof sources have no `sorry`, `admit`, or custom unproved mathematical axioms; the final axiom audit has no `sorryAx`.
 
 ## Rebuild the note and check the distribution
 
@@ -50,7 +59,7 @@ pdflatex -interaction=nonstopmode -halt-on-error main.tex
 
 No external bibliography database is required. The saved PDF was exported using pdfTeX 1.40.25 (MiKTeX 24.1). The source also compiled with the editor compiler. On this machine `latexmk` could not run because Perl was absent, so the successful export used direct `pdflatex` passes. There are no unresolved references or overfull boxes in the final LaTeX log; environment-maintenance notices are recorded in the PDF verification report.
 
-From the package root, check the exact released bytes against their hashes:
+From the package root, check the current allowlisted distribution against its hashes (use the `v0.1.0` checkout for the original release hashes):
 
 ```text
 python make_release.py --check
