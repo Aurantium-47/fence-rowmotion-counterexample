@@ -1,0 +1,16 @@
+PDF build verification summary (exported PDF)
+Source: manuscript/main.tex
+Compiler: pdfTeX 1.40.25 (MiKTeX 24.1)
+Command: pdflatex --disable-installer -interaction=nonstopmode -halt-on-error main.tex
+Two passes in a fresh auxiliary output directory; exit codes: 0, 0.
+The resulting PDF was copied to manuscript/main.pdf.
+No package installation or update was performed; latexmk was not invoked.
+The desktop source compiler also returned success.
+Final-pass LaTeX errors, warnings, undefined references/citations, and overfull/underfull boxes: none.
+Environment notices: unsupported Windows version; MiKTeX updates have not been checked.
+Output: 4 pages, 297141 bytes; 15 embedded font descriptors.
+The first page visibly credits Aurantium. The compiler-generated PDF author metadata field is empty.
+All 237 hexadecimal certificate entries match manuscript/main.tex and data/orbit.csv in order.
+All 237 entries are distinct; total set-bit count: 3774.
+All four exported pages were rendered and visually inspected; no visual defects were observed.
+This PDF build does not constitute a new execution of the Lean build.

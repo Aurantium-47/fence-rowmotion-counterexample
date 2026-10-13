@@ -1,0 +1,103 @@
+{
+  "validation_date": "2026-10-13",
+  "project_name": "w04_fence",
+  "toolchain": "leanprover/lean4:v4.19.0",
+  "lean_release_commit": "6caaee842e94",
+  "lean_target": "x86_64-w64-windows-gnu",
+  "build_exit_code": 0,
+  "build_method": "lean/build.ps1 with explicitly supplied Lean executable and read-only dependency packages",
+  "dependencies_reused_read_only": true,
+  "dependency_git_revisions_verified": true,
+  "compiled_all_project_modules_from_source": true,
+  "modules": [
+    "W04.Poset",
+    "W04.Rowmotion",
+    "W04.Orbit",
+    "W04.Main",
+    "W04"
+  ],
+  "fresh_network_bootstrap_performed": false,
+  "lake_build_invocation_performed": false,
+  "source_identity_check": "Direct byte-array comparison against the verified reference sources; SHA-256 values recorded below.",
+  "sources": [
+    {
+      "path": "lean/W04/Poset.lean",
+      "bytes": 7332,
+      "sha256": "1fa0d7b4d6b66f2c930bbcf989dfb99ecb259189917b0d4fdf1955df56d15563",
+      "reference_sha256": "1fa0d7b4d6b66f2c930bbcf989dfb99ecb259189917b0d4fdf1955df56d15563",
+      "byte_identical_to_reference": true
+    },
+    {
+      "path": "lean/W04/Rowmotion.lean",
+      "bytes": 2765,
+      "sha256": "31b718a090c37f4d662f649b582fe325cf09f6c8152082e52031bf7b725d0210",
+      "reference_sha256": "31b718a090c37f4d662f649b582fe325cf09f6c8152082e52031bf7b725d0210",
+      "byte_identical_to_reference": true
+    },
+    {
+      "path": "lean/W04/Orbit.lean",
+      "bytes": 20231,
+      "sha256": "16e3e3ed09b68a2b8a3a7d5a0520ee851f685830b96bd3a971d757ac0eaa668e",
+      "reference_sha256": "16e3e3ed09b68a2b8a3a7d5a0520ee851f685830b96bd3a971d757ac0eaa668e",
+      "byte_identical_to_reference": true
+    },
+    {
+      "path": "lean/W04/Main.lean",
+      "bytes": 5034,
+      "sha256": "4d2c729be65710b3cbf51e7f3c3e8314ae3f8defc2db4b05847e7c513e246afd",
+      "reference_sha256": "4d2c729be65710b3cbf51e7f3c3e8314ae3f8defc2db4b05847e7c513e246afd",
+      "byte_identical_to_reference": true
+    }
+  ],
+  "dependency_revisions": [
+    {
+      "name": "mathlib",
+      "rev": "c44e0c8ee63ca166450922a373c7409c5d26b00b"
+    },
+    {
+      "name": "plausible",
+      "rev": "77e08eddc486491d7b9e470926b3dbe50319451a"
+    },
+    {
+      "name": "LeanSearchClient",
+      "rev": "25078369972d295301f5a1e53c3e5850cf6d9d4c"
+    },
+    {
+      "name": "importGraph",
+      "rev": "e6a9f0f5ee3ccf7443a0070f92b62f8db12ae82b"
+    },
+    {
+      "name": "proofwidgets",
+      "rev": "c4919189477c3221e6a204008998b0d724f49904"
+    },
+    {
+      "name": "aesop",
+      "rev": "5d50b08dedd7d69b3d9b3176e0d58a23af228884"
+    },
+    {
+      "name": "Qq",
+      "rev": "fa4f7f15d97591a9cf3aa7724ba371c7fc6dda02"
+    },
+    {
+      "name": "batteries",
+      "rev": "f5d04a9c4973d401c8c92500711518f7c656f034"
+    },
+    {
+      "name": "Cli",
+      "rev": "02dbd02bc00ec4916e99b04b2245b30200e200d0"
+    }
+  ],
+  "final_theorem": "W04.paper_fence_counterexample",
+  "final_theorem_axioms": [
+    "propext",
+    "Classical.choice",
+    "Lean.ofReduceBool",
+    "Quot.sound"
+  ],
+  "native_decide_used": true,
+  "pure_kernel_reduction_proof": false,
+  "build_log": "verification/lean_build.log",
+  "axioms_log": "verification/lean_axioms.log",
+  "build_log_sha256": "6b169de16f20a746750d10c32c1fc361456cdcb3a54d992db9edb58aec3a7ea3",
+  "axioms_log_sha256": "40c2464fb6087feef834b52848327f6bf4ca6317da87fe8a8b53874f5646f6eb"
+}

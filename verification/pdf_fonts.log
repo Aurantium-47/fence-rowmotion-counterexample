@@ -1,0 +1,21 @@
+PDF font embedding verification
+PDF: manuscript/main.pdf
+Method: inspect FontDescriptor references and FontFile/FontFile2/FontFile3 streams.
+Embedded font descriptors: 15
+All fonts embedded: true
+
+DHSMQS+LMRoman10-Bold: embedded=true; descriptor=101; stream=100
+VPYUZV+LMRoman12-Bold: embedded=true; descriptor=103; stream=102
+BJRTCW+LMMathExtension10-Regular: embedded=true; descriptor=105; stream=104
+FCUPBU+LMMathItalic10-Regular: embedded=true; descriptor=107; stream=106
+WRPWRM+LMMathItalic6-Regular: embedded=true; descriptor=109; stream=108
+JQEPTP+LMMathItalic8-Regular: embedded=true; descriptor=111; stream=110
+SXXHDI+LMRoman10-Regular: embedded=true; descriptor=113; stream=112
+VLETPT+LMRoman12-Regular: embedded=true; descriptor=115; stream=114
+NJUUXM+LMRoman17-Regular: embedded=true; descriptor=117; stream=116
+NONQNL+LMRoman7-Regular: embedded=true; descriptor=119; stream=118
+MOEXRY+LMRoman8-Regular: embedded=true; descriptor=121; stream=120
+XHYNAQ+LMRoman10-Italic: embedded=true; descriptor=123; stream=122
+BPOJDZ+LMMathSymbols10-Regular: embedded=true; descriptor=125; stream=124
+OGEGAW+LMMathSymbols8-Regular: embedded=true; descriptor=127; stream=126
+FZDCSD+LMMono10-Regular: embedded=true; descriptor=129; stream=128

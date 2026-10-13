@@ -1,0 +1,48 @@
+{
+  "status": "PASS",
+  "pdf": "manuscript/main.pdf",
+  "source": "manuscript/main.tex",
+  "pdf_sha256": "944736fb91e23992a9bb166dfc50d174ec5be4810cc9e453f3118455e7a8776a",
+  "source_sha256": "f758bdb8b60177004846b9925fd2ba317ec5f2551be02378d943360627a58ea7",
+  "pages": 4,
+  "bytes": 297141,
+  "latex_exit_codes": [
+    0,
+    0
+  ],
+  "compiler": "pdfTeX 1.40.25 (MiKTeX 24.1)",
+  "build_command": "pdflatex --disable-installer -interaction=nonstopmode -halt-on-error main.tex",
+  "build_passes": 2,
+  "package_installer_disabled": true,
+  "latexmk_used": false,
+  "desktop_source_compilation": "success",
+  "final_latex_warnings": [],
+  "environment_notices": [
+    "MiKTeX reports an unsupported Windows version.",
+    "MiKTeX reports that updates have not been checked."
+  ],
+  "all_fonts_embedded": true,
+  "font_check_method": "PDF font descriptor FontFile/FontFile2/FontFile3 streams",
+  "embedded_font_count": 15,
+  "pdf_metadata": {
+    "format": "PDF 1.5",
+    "title": "",
+    "author": "",
+    "subject": "",
+    "keywords": "",
+    "creator": "LaTeX with hyperref",
+    "producer": "MiKTeX pdfTeX-1.40.25",
+    "creationDate": "D:20261013093233+08'00'",
+    "modDate": "D:20261013093233+08'00'",
+    "trapped": "",
+    "encryption": null
+  },
+  "visible_author": "Aurantium",
+  "metadata_note": "The compiler-generated PDF author field is empty; the author is printed on the first page.",
+  "pdf_certificate_entries": 237,
+  "pdf_certificate_exactly_matches_tex_and_csv": true,
+  "pdf_certificate_distinct": true,
+  "pdf_certificate_popcount_sum": 3774,
+  "all_four_final_pages_rendered_and_visually_inspected": true,
+  "visual_defects_observed": false
+}

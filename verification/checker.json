@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "python_version": "3.8.3",
+  "vertex_count": 32,
+  "segment_count": 11,
+  "paper_segment_parameters": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+  ],
+  "shared_vertices": [
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21,
+    24,
+    27,
+    30
+  ],
+  "initial_ideal": [
+    5,
+    6,
+    7,
+    8,
+    12
+  ],
+  "checked_lower_ideals": 237,
+  "distinct_states": 237,
+  "checked_rowmotion_steps_including_closure": 237,
+  "least_positive_period": 237,
+  "ideal_cardinality_sum": 3774,
+  "conjectured_sum": 3792,
+  "mean": "1258/79",
+  "deviation_from_half_vertex_count": "-6/79",
+  "all_csv_fields_checked": true,
+  "lean_orbit_literals_match": true,
+  "lean_code_literals_match": true,
+  "sha256": {
+    "data/orbit.csv": "dad24c5d68b6e4f4fbd8bfc6390ef11b0776d341fbf2951bbb0e3e4cfc36dabb",
+    "lean/W04/Orbit.lean": "16e3e3ed09b68a2b8a3a7d5a0520ee851f685830b96bd3a971d757ac0eaa668e",
+    "checker/check.py": "0449203c004c89dbd08022b422ccf38100b178ee6f531ccfa7e86a9190def71f"
+  },
+  "scope": "Exact finite certificate and Lean data transcription; no Lean proof execution or priority determination."
+}

@@ -1,0 +1,10 @@
+_internal/
+_release/
+INTERNAL_PREPUBLICATION_CHECK.md
+lean/.lake/
+__pycache__/
+manuscript/*.aux
+manuscript/*.log
+manuscript/*.out
+manuscript/*.fls
+manuscript/*.fdb_latexmk

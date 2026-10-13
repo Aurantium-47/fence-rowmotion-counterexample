@@ -1,0 +1,9 @@
+.lake/
+*.olean
+*.ilean
+*.c
+*.o
+*.obj
+*.dll
+*.so
+*.dylib

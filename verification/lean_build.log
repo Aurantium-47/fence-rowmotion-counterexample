@@ -1,0 +1,44 @@
+PIN mathlib c44e0c8ee63ca166450922a373c7409c5d26b00b
+PIN plausible 77e08eddc486491d7b9e470926b3dbe50319451a
+PIN LeanSearchClient 25078369972d295301f5a1e53c3e5850cf6d9d4c
+PIN importGraph e6a9f0f5ee3ccf7443a0070f92b62f8db12ae82b
+PIN proofwidgets c4919189477c3221e6a204008998b0d724f49904
+PIN aesop 5d50b08dedd7d69b3d9b3176e0d58a23af228884
+PIN Qq fa4f7f15d97591a9cf3aa7724ba371c7fc6dda02
+PIN batteries f5d04a9c4973d401c8c92500711518f7c656f034
+PIN Cli 02dbd02bc00ec4916e99b04b2245b30200e200d0
+BUILD W04/Poset.lean with Lean (version 4.19.0, x86_64-w64-windows-gnu, commit 6caaee842e94, Release)
+W04/Poset.lean:150:6: warning: try 'simp at hz' instead of 'simpa using hz'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+W04/Poset.lean:159:8: warning: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+'W04.FLe_iff_segmentLe' depends on axioms: [propext, Classical.choice, Quot.sound]
+'W04.segment_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'W04.segment_isMaxChain' depends on axioms: [propext, Classical.choice, Quot.sound]
+'W04.isMaxChain_iff_segment' depends on axioms: [propext, Classical.choice, Quot.sound]
+'W04.shared_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'W04.paper_parameter_three' depends on axioms: [propext, Classical.choice, Quot.sound]
+PASS W04/Poset.lean
+BUILD W04/Rowmotion.lean with Lean (version 4.19.0, x86_64-w64-windows-gnu, commit 6caaee842e94, Release)
+PASS W04/Rowmotion.lean
+BUILD W04/Orbit.lean with Lean (version 4.19.0, x86_64-w64-windows-gnu, commit 6caaee842e94, Release)
+'W04.orbit_lower' depends on axioms: [propext, Lean.ofReduceBool, Quot.sound]
+'W04.orbit_step' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.orbit_injective' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.orbit_sum' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+PASS W04/Orbit.lean
+BUILD W04/Main.lean with Lean (version 4.19.0, x86_64-w64-windows-gnu, commit 6caaee842e94, Release)
+'W04.counterexample' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.not_halfCardinalityHomomesy' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.paper_fence_counterexample' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.FLe_iff_segmentLe' depends on axioms: [propext, Classical.choice, Quot.sound]
+'W04.orbit_mean' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.mem_orbitSet_iff' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.closed_after_237' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.no_earlier_return' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.rho_period_237' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+'W04.rho_no_earlier_return' depends on axioms: [propext, Classical.choice, Lean.ofReduceBool, Quot.sound]
+PASS W04/Main.lean
+BUILD W04.lean
+PASS W04.lean
+BUILD RESULT: SUCCESS

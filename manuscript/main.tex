@@ -1,0 +1,268 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newcommand{\JJ}{\mathcal J}
+\newcommand{\FF}{\breve F}
+\title{A finite counterexample to ideal-cardinality\protect\\ homomesy on constant-parameter fences}
+\author{Aurantium}
+\date{13 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We give an explicit finite counterexample to Conjecture 5.4(b) of
+Elizalde, Plante, Roby, and Sagan, \emph{Rowmotion on fences}.
+For the 32-element fence $\FF(3^{11})$, the lower ideal
+$\{5,6,7,8,12\}$ has rowmotion period 237, and the sum of ideal
+cardinalities on its orbit is 3774. The orbit average is therefore
+$1258/79$, rather than $16$. We supply the complete orbit, an independent
+integer-arithmetic checker, and a Lean 4 formalization connecting the
+paper's segment convention to the orbit calculation. The formalization
+uses \texttt{native\_decide}; its trust assumptions include
+\texttt{Lean.ofReduceBool} and the correctness of the Lean compiler.
+No claim of priority is made.
+\end{abstract}
+
+\section{The conjecture and the precise fence}
+For a finite poset $P$, write $\JJ(P)$ for its set of lower ideals.
+Rowmotion on lower ideals is
+\[
+  \rho(I)=\mathord\downarrow\min(P\setminus I).
+\]
+A statistic $f$ is $c$-mesic if its average on every rowmotion orbit is
+$c$. Conjecture 5.4(b) of \cite[p.~35]{eprs} states that, for a fence
+$\FF(a^t)$ with constant segment parameter and an odd number $t$ of
+segments, the statistic $I\mapsto |I|$ is $|P|/2$-mesic.
+Segments here are maximal chains. The parameter of a segment is one plus
+the number of its \emph{unshared} vertices, not uniformly its number of edges;
+a shared vertex belongs to two adjacent segments \cite[p.~17]{eprs}.
+
+Let $P$ have vertices $1,\ldots,32$. Its cover relations are given by the
+following chains, each written from smaller to larger in the poset:
+\[
+\begin{array}{lll}
+1<2<3, & 6<5<4<3, & 6<7<8<9,\\
+12<11<10<9, & 12<13<14<15, & 18<17<16<15,\\
+18<19<20<21, & 24<23<22<21, & 24<25<26<27,\\
+30<29<28<27, & 30<31<32. &
+\end{array}
+\]
+Equivalently, the underlying cover graph is the path $1,\ldots,32$.
+For $1\le e\le31$, its edge from $e$ to $e+1$ points upward exactly
+when $\lfloor e/3\rfloor$ is even. The partial order is the reflexive
+transitive closure of these oriented edges.
+
+The displayed chains are exactly the maximal chains: a chain can follow
+the oriented path only until the next change of direction. Their shared
+vertices are $3,6,9,\ldots,30$. Each endpoint segment has three vertices
+and one shared vertex, whereas each of the nine internal segments has
+four vertices and two shared vertices. Thus every segment has exactly
+two unshared vertices and parameter 3. There are 11 segments and 32
+vertices, so this is precisely $P=\FF(3^{11})$ in the convention of
+\cite{eprs}. In particular, the number of segments is odd.
+
+\section{The orbit certificate and the contradiction}
+\begin{theorem}\label{thm:counterexample}
+For the fence $P=\FF(3^{11})$ defined above, the lower ideal
+$I_0=\{5,6,7,8,12\}$ has a rowmotion orbit $\mathcal O$ satisfying
+\[
+ |\mathcal O|=237,\qquad \sum_{I\in\mathcal O}|I|=3774.
+\]
+Its least positive return time is 237. Consequently Conjecture 5.4(b)
+of \cite{eprs} is false.
+\end{theorem}
+
+The complete finite certificate appears in Appendix~\ref{app:certificate}.
+An eight-digit hexadecimal integer $m_k$ encodes
+\[
+ I_k=\{v\in\{1,\ldots,32\}:\text{bit }v-1\text{ of }m_k\text{ is }1\}.
+\]
+The accompanying \texttt{data/orbit.csv} also lists the vertices,
+cardinality, and maximal antichain of every ideal. The following
+elementary certificate criterion explains exactly what is checked.
+
+\begin{lemma}\label{lem:certificate}
+Let $L$ be a positive integer. Suppose $I_0,\ldots,I_{L-1}$ are distinct lower ideals and
+$\rho(I_k)=I_{(k+1)\bmod L}$ for every $0\le k<L$.
+Then the forward orbit of $I_0$ is exactly this set of $L$ ideals,
+and its least positive return time is $L$.
+\end{lemma}
+\begin{proof}
+Induction gives $\rho^n(I_0)=I_{n\bmod L}$ for every $n\ge0$.
+Thus every iterate is in the list, and every listed ideal occurs as an
+iterate. Closure gives a return at $L$; distinctness excludes a return
+at any $0<n<L$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:counterexample}]
+The principal lower sets of $5$, $6$, $7$, $8$, and $12$ are contained
+in $I_0$, so $I_0$ is a lower ideal. For an explicit verification of the
+certificate, define $D(x)=\{y:y\le_P x\}$. The order can be evaluated
+without a closure algorithm: for $x<y$ numerically, $x\le_P y$ exactly
+when every edge between them points right, and $y\le_P x$ exactly when
+every such edge points left. Together with reflexivity this determines
+all principal lower sets.
+
+For each of the 237 encoded sets, verify
+\[
+ x\in I_k\ \Longrightarrow\ D(x)\subseteq I_k.
+\]
+Then compute, with indices taken modulo 237,
+\[
+ M_k=\{x\notin I_k:D(x)\setminus\{x\}\subseteq I_k\},
+ \qquad I_{k+1}=\bigcup_{x\in M_k}D(x).
+\]
+These formulas are respectively the lower-ideal condition, the minimal
+elements of the complement, and the definition of rowmotion. The
+supplied checker verifies all 237 equalities, including the last-to-first
+equality, distinctness of all 237 masks, and the cardinality sum 3774.
+The Lean development verifies the same finite conditions on actual
+finite sets and proves the conclusion of Lemma~\ref{lem:certificate}.
+All arithmetic is integral or rational.
+
+It follows that the complete orbit has mean
+\[
+ \frac{3774}{237}=\frac{1258}{79}=16-\frac6{79}\ne16=\frac{|P|}{2}.
+\]
+Equivalently, the conjectured sum is $237\cdot16=3792$, exceeding the
+actual sum by 18. This single orbit satisfies the conjecture's hypotheses
+and violates its conclusion.
+\end{proof}
+
+\section{Reproduction and formal verification}
+From the root of the accompanying package, run
+\begin{verbatim}
+python checker/check.py
+\end{verbatim}
+The checker uses only the Python standard library. It reads the supplied
+CSV instead of regenerating it, constructs the order directly from the
+path orientation, and checks the complete orbit and its agreement with
+the Lean orbit literals. The certificate is also fully printed here so
+that the finite data can be checked independently of the distribution.
+
+The Lean development fixes Lean 4.19.0 and mathlib at commit
+\begin{center}
+\small\texttt{c44e0c8ee63ca166450922a373c7409c5d26b00b}.
+\end{center}
+All transitive dependencies are pinned in the lockfile. Portable instructions, the
+actual build logs, and the axiom audit are included. The four modules
+have the following roles:
+\begin{itemize}
+\item \texttt{Poset}: the 32-element partial order; all maximal chains;
+      distinct segments, shared vertices, and the parameter convention.
+\item \texttt{Rowmotion}: genuine lower ideals and the identity
+      $\rho(I)=\mathord\downarrow\min(P\setminus I)$.
+\item \texttt{Orbit}: all 237 lower ideals, all transitions including
+      closure, distinctness, and the sum 3774.
+\item \texttt{Main}: every iterate, completeness of the orbit, its
+      least period and mean, and the failure of half-cardinality homomesy.
+\end{itemize}
+The theorem \texttt{W04.paper\_fence\_counterexample} combines the
+segment convention with the dynamical failure. The order on the vertices
+is the explicit fence relation, rather than the numerical order on
+\texttt{Fin 32}.
+
+\paragraph{Trust assumptions.}
+The finite orbit certificates use \texttt{native\_decide}.
+The final counterexample theorem's printed axiom dependencies are
+\begin{center}
+\texttt{propext, Classical.choice, Lean.ofReduceBool, Quot.sound}.
+\end{center}
+In particular, \texttt{Lean.ofReduceBool} adds trust in native evaluation
+and the correctness of the Lean compiler. This is not a completed
+kernel-reduction-only proof. The final sources contain no
+\texttt{sorry}, \texttt{admit}, or custom unproved mathematical axioms;
+the final theorem dependencies contain no \texttt{sorryAx}. The CSV and
+Python checker are not introduced as Lean axioms. Successful compilation
+is a machine verification result, not a claim of external human review.
+
+\section{Scope and literature boundary}
+The conclusion concerns Conjecture 5.4(b), about ideal-cardinality
+homomesy; it makes no assertion against Conjecture 5.4(a), about
+antichain-cardinality homometry. No minimality among counterexamples is
+claimed.
+
+Mertin and Poznanovi\'c \cite{mp} restate the target as Conjecture 12
+and study equivalent or stronger forms. Their three-segment result
+(Theorem 19) and their result for dihedral orbits (Theorem 26) do not
+assert the required average on each eleven-segment rowmotion orbit.
+The present counterexample does not depend on their identities.
+The literature check did not identify an earlier instance of this
+counterexample in the materials inspected; this is not an exhaustive
+priority determination. The official record and abstract of Mertin's
+2025 dissertation \cite{mertin} were accessible, but its full text could
+not be retrieved because the download returned HTTP 403. Its contents
+have not been ruled out as a prior source of the result. We therefore
+make no first-discovery claim.
+
+\paragraph{AI assistance.}
+This work was prepared with AI assistance. No independent human
+peer-review claim is made.
+
+\begin{thebibliography}{9}
+\bibitem{eprs}
+S. Elizalde, M. Plante, T. Roby, and B. E. Sagan,
+\emph{Rowmotion on fences}, Algebraic Combinatorics \textbf{6}(1)
+(2023), 17--36. \href{https://doi.org/10.5802/alco.256}{doi:10.5802/alco.256}.
+
+\bibitem{mp}
+A. Mertin and S. Poznanovi\'c,
+\emph{Toggleability Spaces of Fences}, Electronic Journal of
+Combinatorics \textbf{31}(4) (2024), P4.46.
+\href{https://doi.org/10.37236/13085}{doi:10.37236/13085}.
+
+\bibitem{mertin}
+A. Mertin, \emph{Homomesies and Toggleability Spaces}, Ph.D. dissertation,
+Clemson University, August 2025.
+\href{https://open.clemson.edu/all_dissertations/4090/}{Official record 4090}.
+Record and abstract inspected; full text not retrieved.
+\end{thebibliography}
+
+\appendix
+\section{The complete orbit in hexadecimal}\label{app:certificate}
+Read the entries from left to right and then top to bottom, starting at
+$k=0$. There are 237 entries, with eight entries per full line. Bit $v-1$
+encodes vertex $v$. Thus the first entry encodes $\{5,6,7,8,12\}$.
+The last entry maps back to the first under rowmotion. The sum of the
+numbers of set bits is 3774.
+\begin{center}
+\small\ttfamily
+\begin{tabular}{@{}llllllll@{}}
+000008f0 & 20821c39 & 71c73e63 & fbef80f0 & 3ffe0839 & 60031c63 & f087bef0 & 39cffff9 \\
+63e00003 & f0020820 & 38871c71 & 61cfbefb & f3e3ffff & 38060000 & 608f0821 & f1c39c73 \\
+3be63ef8 & 7f8f0fe1 & e0c39833 & 31e63c78 & 7b8f0ee1 & ffc39ff3 & 00e63838 & 218f0c61 \\
+73c39ef3 & f8e63ff8 & 018f0001 & 23c38823 & 70e61c70 & f98f3ef9 & 03c38fe3 & 20e61830 \\
+718f3c79 & fbc38ee3 & 3fe61ff0 & 600f3839 & f0838c63 & 39c61ef0 & 63ef3ff9 & f0ff8003 \\
+39800820 & 63c21c71 & f0e73efb & 398f8fff & 63c01800 & f0e23c21 & 39870e73 & 63cf98f8 \\
+f0e03c01 & 39820e23 & 63c71870 & f0efbcf9 & 39fffe03 & 63800020 & f0c20871 & 39e71cfb \\
+638fbe3f & f0c3f860 & 39e60cf1 & 638f1e3b & f0c3b87f & 39e7fce0 & 638e0e31 & f0c3187b \\
+39e7bcff & 638ffe00 & f0c00021 & 39e20873 & 63871cf8 & f0cfbe01 & 39e3f823 & 63860c70 \\
+f0cf1ef9 & 39e3bfe3 & 6387f830 & f0ce0c79 & 39e31ee3 & 6387bff0 & f0cff839 & 39e00c63 \\
+63821ef0 & f0c73ff9 & 39ef8003 & 63fe0820 & f0031c71 & 3887befb & 61cfffff & f3e00000 \\
+38020821 & 60871c73 & f1cfbef8 & 3be3ffe1 & 7f860033 & e0cf0878 & 31e39ce1 & 7b863e33 \\
+ffcf0078 & 00e388e1 & 21861c33 & 73cf3e78 & f8e380e1 & 01860833 & 23cf1c78 & 70e3bee1 \\
+f987fff3 & 03ce0038 & 20e30861 & 71879cf3 & fbce3e38 & 3fe30061 & 600788f3 & f08e1c38 \\
+39c33e61 & 63e780f3 & f00e0838 & 38831c61 & 61c7bef3 & f3effff8 & 38fe0001 & 61830823 \\
+f3c79c70 & 38ee3ef9 & 61ff0fe3 & f3839830 & 38c63c79 & 61ef0ee3 & f3ff9ff0 & 38003839 \\
+60820c63 & f1c71ef0 & 3befbff9 & 7ffff803 & e0000c20 & 30821e71 & 79c738fb & e3ef8c3f \\
+30fe1e60 & 798338f1 & e3c78c3b & 30ee1e7f & 79ff38e0 & e3838c31 & 30c61e7b & 79ef38ff \\
+e3ff8c00 & 30001e21 & 78823873 & e1c70cf8 & 33ef9e01 & 78fe3823 & e1830c70 & 33c79ef9 \\
+78ee3fe3 & e1ff0030 & 33838879 & 78c61ce3 & e1ef3e30 & 33ff8079 & 780008e3 & e0821c30 \\
+31c73e79 & 7bef80e3 & fffe0830 & 00031c79 & 2087bee3 & 71cffff0 & fbe00039 & 3f820863 \\
+60c71cf0 & f1efbe39 & 3bfff863 & 7f800cf0 & e0c21e39 & 31e73863 & 7b8f8cf0 & ffc01e39 \\
+00e23863 & 21870cf0 & 73cf9e39 & f8e03863 & 01820cf0 & 23c71e39 & 70efb863 & f9fffcf0 \\
+03800e39 & 20c21863 & 71e73cf0 & fb8f8e39 & 3fc01863 & 60e23cf0 & f1870e39 & 3bcf9863 \\
+7fe03cf0 & e0020e39 & 30871863 & 79cfbcf0 & e3e3fe39 & 30060063 & 788f08f0 & e1c39c39 \\
+33e63e63 & 780f00f0 & e0838839 & 31c61c63 & 7bef3ef0 & ffff8ff9 & 00001803 & 20823c20 \\
+71c70e71 & fbef98fb & 3ffe3c3f & 60030e60 & f08798f1 & 39ce3c3b & 63e30e7f & f00798e0 \\
+388e3c31 & 61c30e7b & f3e798ff & 380e3c00 & 60830e21 & f1c79873 & 3bee3cf8 & 7fff0e01 \\
+e0039823 & 30863c70 & 79cf0ef9 & e3e39fe3 & 30063830 & 788f0c79 & e1c39ee3 & 33e63ff0 \\
+780f0039 & e0838863 & 31c61cf0 & 7bef3e39 & ffff8063 \\
+\end{tabular}
+\end{center}
+\end{document}
