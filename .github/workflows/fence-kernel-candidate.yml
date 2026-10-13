@@ -1,0 +1,270 @@
+name: Fence kernel candidate first compile (not a release)
+
+'on':
+  push:
+    branches: [verification/fence-kernel-candidate-01]
+    paths: [kernel-candidate/**, .github/workflows/fence-kernel-candidate.yml]
+
+permissions: {}
+concurrency:
+  group: fence-kernel-candidate-01
+  cancel-in-progress: false
+
+jobs:
+  candidate-test:
+    if: github.event.repository.private == false && github.repository == 'Aurantium-47/fence-rowmotion-counterexample'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      CANDIDATE_SHA: ${{ github.sha }}
+      LEAN_NUM_THREADS: '1'
+      MATHLIB_NO_CACHE_ON_UPDATE: '1'
+    steps:
+      - name: Fetch and identify the candidate alongside the unchanged release
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e public-source
+          git init public-source
+          git -C public-source remote add origin https://github.com/Aurantium-47/fence-rowmotion-counterexample.git
+          git -C public-source fetch --depth 1 origin "$CANDIDATE_SHA"
+          git -C public-source checkout --detach FETCH_HEAD
+          test "$(git -C public-source rev-parse HEAD)" = "$CANDIDATE_SHA"
+          git -C public-source fetch --depth 1 origin 516b2b4ab803b9dee2796c22edf9e2d33014b5d6
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, shutil, subprocess
+          root = pathlib.Path('public-source')
+          baseline = '516b2b4ab803b9dee2796c22edf9e2d33014b5d6'
+          expected = {'kernel-candidate/Audit.lean': '30d4e5c1eef068d26fb1aa76c254e5b89d8927b554edf18a548092330bd96440', 'kernel-candidate/lake-manifest.json': 'a0ff41bd0fd3e2f23b7be722836bbc745e39a77dfce488635b5e58b07bab8a68', 'kernel-candidate/lakefile.toml': '652ef2238547ac3eb06dc8c40eeed853dc401ff9231532e439ca89fafe7698cf', 'kernel-candidate/lean-toolchain': '55e97be96000b5e9e290c9e74482e5e317861499a5540353ce845471bded8cea', 'kernel-candidate/W04/KernelCert/C00.lean': '5c3c135e41aa3510eb161df92a7dec2774f132876d5497eda358881ebe25f98f', 'kernel-candidate/W04/KernelCert/C01.lean': '0d0ecefa75accebeb8145b1dcef4a945c9b7eed275b3a937a636da05bdcfa44b', 'kernel-candidate/W04/KernelCert/C02.lean': '3d3bd8e90008f8043c690e1943b0c9bd6f445812e25d9750cfbcb730f6346cff', 'kernel-candidate/W04/KernelCert/C03.lean': '3a1ad200eeb5eb387ee4ae354106c908e2e7caf4b98336a165acfe4b7e664132', 'kernel-candidate/W04/KernelCert/C04.lean': '3193f896a901a03140281e786e083c4f5385ecd71520654c30635e3e7fb73737', 'kernel-candidate/W04/KernelCert/C05.lean': '842a736a6cf286a67ebd772c3bd15211cb541acb8631a948aa2515871f070439', 'kernel-candidate/W04/KernelCert/C06.lean': '1879bf8053855aabe298d395cc23eccac00980c320473056d8bbea430d44d011', 'kernel-candidate/W04/KernelCert/C07.lean': '4d4d5f33ab004642fad6dc8136670abe4b5814b09c1dbf1f3acd7f92a9cf38cd', 'kernel-candidate/W04/KernelCert/C08.lean': 'e17e34a6b317aae077f6db9191d6faecfe04cacfe984d1623418e27ae58a54f4', 'kernel-candidate/W04/KernelCert/C09.lean': 'b91c4d7ba7a4c3cca57bc239baaeb878c2833821f2f964dd67a78d4349301526', 'kernel-candidate/W04/KernelCert/C10.lean': 'cc246b230da5fbd8f8bd8de6833741d19f87c09839201a46d07c94e3144e93d2', 'kernel-candidate/W04/KernelCert/C11.lean': 'c217d7e6f6fdce6ba04d32e48887fe936fd4f33df04282052ef376fc89610565', 'kernel-candidate/W04/KernelCert/C12.lean': 'ea172d88d89dd1858c377bd923750d1dc5cb384b92e5ec3aeda648c64e698fc3', 'kernel-candidate/W04/KernelCert/C13.lean': 'f62629246bcbce8d89f129f52c5385aae59f879a8e3f007e8124232425729cb7', 'kernel-candidate/W04/KernelCert/C14.lean': 'ce41c58ee3a0e57c671f7d2946f371a42740b1703905cf535aa16d1f9ad916a5', 'kernel-candidate/W04/KernelCert/C15.lean': 'c01d44734c81361b01f9816e9e55b209ccdbf10fea480ae190130a9c5a38f84c', 'kernel-candidate/W04/KernelCert/C16.lean': 'e9e46ef7235264dd0a6c30cdf88e573eb08758e314f9765c40cc2a9e28f1c360', 'kernel-candidate/W04/KernelCert/C17.lean': 'f221cf8afe39276773f45c644f62f06e02fffb311519581b6f33e1b6a879c22c', 'kernel-candidate/W04/KernelCert/C18.lean': 'cae07fcc0e9be1f82d1895e5c1835c9b243ad2afcd93ddbdfae081ed3731c0f0', 'kernel-candidate/W04/KernelCert/C19.lean': '0513410cfb851db27dbdfa708b50b3c6e672c996764b0999efeebcdbc885ed45', 'kernel-candidate/W04/KernelCert/C20.lean': '8947ac51bca15b69483acd4b95f5b1586273f5599cf2eaa7cb5866bdb7aa3150', 'kernel-candidate/W04/KernelCert/C21.lean': '8d2409d77cebe4b080017babda461385632af6e6a9ed44561bfdd4cfbb51da37', 'kernel-candidate/W04/KernelCert/C22.lean': '52c373c5f288e3ec83a212b3621882ebc3b8870e2a1995007c7c1349abb194a1', 'kernel-candidate/W04/KernelCert/C23.lean': '186d78363430e4632f3e2cd253a4d2c5161e3ad756d33e374ebe24d9591c6c86', 'kernel-candidate/W04/KernelCert/C24.lean': '8db267281dbc29ec6558eeac2cf32711c75c9506ef59792601e1d9b1a31b8f85', 'kernel-candidate/W04/KernelCert/C25.lean': 'e6ddb29986f0dd28c47a4dc32c22ba5567216a474ec57aac80bc44dc51f74d2e', 'kernel-candidate/W04/KernelCert/C26.lean': '119211d1a621dca229c35617a327c3b46668ac80802b7509b99db06209f6c13b', 'kernel-candidate/W04/KernelCert/C27.lean': '306ae75b3745fc2f449efebca7e44810ae88bc766d4bddf46a94f52b92cff633', 'kernel-candidate/W04/KernelCert/C28.lean': 'df95c35dcf9190226dfb1ffb57e880a78d3e5a1610b816a63eacc4060ab7e05e', 'kernel-candidate/W04/KernelCert/C29.lean': '75b908e427a74e0c45688d12aa5934e85ce8213910c8910b740f67d3e6275edf', 'kernel-candidate/W04/KernelData.lean': '6c4d6ac23af57b3e493b9c1a99ab65df1fba0e8d99b1d73bd36a290214f7c2f2', 'kernel-candidate/W04/Main.lean': '4d2c729be65710b3cbf51e7f3c3e8314ae3f8defc2db4b05847e7c513e246afd', 'kernel-candidate/W04/Orbit.lean': '8e1461c1093f4481ec66b531076f6c3eeac73722730039259eb86833a2e4e17f', 'kernel-candidate/W04/Poset.lean': '1fa0d7b4d6b66f2c930bbcf989dfb99ecb259189917b0d4fdf1955df56d15563', 'kernel-candidate/W04/Rowmotion.lean': '31b718a090c37f4d662f649b582fe325cf09f6c8152082e52031bf7b725d0210', 'kernel-candidate/W04/SmokeData.lean': 'bb8648455dfcd56b43bfe5f5da5c6083125c648d7f17fdecc0e5cb8aaa61d9c8', 'kernel-candidate/W04/SmokeLiteral.lean': 'd4a925501029308440448d4983ab3d1d1151f0e4cef56b39a441bc225e685815', 'kernel-candidate/W04.lean': '779b2211231770800703c4d98e815a47583b4f23f425cd90c8a8f23d86944d43'}
+          workflow = '.github/workflows/fence-kernel-candidate.yml'
+          changed = subprocess.check_output(['git', '-C', str(root), 'diff', '--name-status', baseline, 'HEAD'], text=True).splitlines()
+          assert set(changed) == {'A\t' + p for p in list(expected) + [workflow]}, changed
+          for path, digest in expected.items():
+              assert hashlib.sha256((root / path).read_bytes()).hexdigest() == digest, path
+          mem = {s.split(':')[0]: int(s.split()[1]) * 1024 for s in pathlib.Path('/proc/meminfo').read_text().splitlines() if s.startswith(('MemTotal:', 'MemAvailable:'))}
+          print('RUNNER_RESOURCES', json.dumps(dict(mem, disk_free=shutil.disk_usage('.').free)), flush=True)
+          assert mem['MemTotal'] >= 14 * 1024**3 and mem['MemAvailable'] >= 12 * 1024**3
+          assert shutil.disk_usage('.').free >= 10 * 1024**3, 'Insufficient disk; do not prune'
+          pathlib.Path('candidate-hashes.json').write_text(json.dumps(expected, sort_keys=True))
+          print('CANDIDATE_COMMIT', os.environ['CANDIDATE_SHA'], 'UNCHANGED_RELEASE', baseline, flush=True)
+          print('CANDIDATE_SOURCE_HASHES', json.dumps(expected, sort_keys=True), flush=True)
+          print('WORKFLOW_SHA256', hashlib.sha256((root / workflow).read_bytes()).hexdigest(), flush=True)
+          print('STATUS: this is an uncompiled mathematical candidate; only this run can establish compilation.', flush=True)
+          PY
+          test "$(tr -d '\r\n' < public-source/kernel-candidate/lean-toolchain)" = leanprover/lean4:v4.19.0
+          curl --fail --location --retry 3 https://github.com/leanprover/lean4/releases/download/v4.19.0/lean-4.19.0-linux.tar.zst --output lean-4.19.0-linux.tar.zst
+          printf '%s\n' '6fe3ce97a58f44e2b3567d455b994eacec5bfe9ae7774f2a573444480ba813fe  lean-4.19.0-linux.tar.zst' | sha256sum --check
+          tar --zstd -xf lean-4.19.0-linux.tar.zst
+          "$PWD/lean-4.19.0-linux/bin/lean" --version
+          "$PWD/lean-4.19.0-linux/bin/lean" --version | grep -F '6caaee842e94'
+          printf '%s\n' '92c3d35b5bfaa5e0fea413a775d504cf46cd95e1345df61c2274f76779e7e023  lean-4.19.0-linux/bin/lean' '5111aee5c9434ab05d4265606475ef22e8bda69aaf3a0657b61a7eec6e550bed  lean-4.19.0-linux/bin/lake' | sha256sum --check
+          printf '%s\n' "$PWD/lean-4.19.0-linux/bin" >> "$GITHUB_PATH"
+          printf 'LEAN_SYSROOT=%s\n' "$PWD/lean-4.19.0-linux" >> "$GITHUB_ENV"
+
+      - name: Fetch exact dependency revisions without updating the manifest
+        working-directory: public-source/kernel-candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, pathlib, subprocess
+          root = pathlib.Path.cwd()
+          manifest = root / 'lake-manifest.json'
+          assert hashlib.sha256(manifest.read_bytes()).hexdigest() == 'a0ff41bd0fd3e2f23b7be722836bbc745e39a77dfce488635b5e58b07bab8a68'
+          print('MANIFEST_SHA256', hashlib.sha256(manifest.read_bytes()).hexdigest())
+          packages = json.loads(manifest.read_text())['packages']
+          assert len(packages) == 9
+          assert next(p for p in packages if p['name'] == 'mathlib')['rev'] == 'c44e0c8ee63ca166450922a373c7409c5d26b00b'
+          for p in packages:
+              assert p['type'] == 'git' and p['url'].startswith('https://github.com/')
+              target = root / '.lake/packages' / p['name']
+              assert not target.exists()
+              target.mkdir(parents=True)
+              subprocess.run(['git', 'init', str(target)], check=True)
+              subprocess.run(['git', '-C', str(target), 'remote', 'add', 'origin', p['url']], check=True)
+              subprocess.run(['git', '-C', str(target), 'fetch', '--depth', '1', 'origin', p['rev']], check=True)
+              subprocess.run(['git', '-C', str(target), 'checkout', '--detach', 'FETCH_HEAD'], check=True)
+              actual = subprocess.check_output(['git', '-C', str(target), 'rev-parse', 'HEAD'], text=True).strip()
+              assert actual == p['rev']
+              print('DEPENDENCY', p['name'], actual)
+              if p['name'] == 'proofwidgets':
+                  subprocess.run(['git', '-C', str(target), 'fetch', '--depth', '1', 'origin',
+                                  'refs/tags/v0.0.57:refs/tags/v0.0.57'], check=True)
+                  release_commit = subprocess.check_output(
+                      ['git', '-C', str(target), 'rev-parse', 'v0.0.57^{commit}'], text=True).strip()
+                  assert release_commit == p['rev']
+                  release_tag = subprocess.check_output(
+                      ['git', '-C', str(target), 'describe', '--tags', '--exact-match', 'HEAD'], text=True).strip()
+                  assert release_tag == 'v0.0.57'
+                  print('RELEASE_TAG', p['name'], release_tag, release_commit)
+          # Keep all downloaded files: disable only the upstream cache helper's directory pruning.
+          helper = root / '.lake/packages/mathlib/Cache/Requests.lean'
+          text = helper.read_text()
+          for old in ['IO.FS.removeDirAll (buildDir / "lib")', 'IO.FS.removeDirAll (buildDir / "ir")']:
+              assert text.count(old) == 1
+              text = text.replace(old, 'pure ()')
+          helper.write_text(text)
+          assert hashlib.sha256(helper.read_bytes()).hexdigest() == '646fed31a48d85ed75746ec09d06c23f5abdaca455518b6760b0dcb2b10c47c0'
+          print('CACHE_HELPER_PATCH_SHA256', hashlib.sha256(helper.read_bytes()).hexdigest())
+          subprocess.run(['git', '-C', str(helper.parents[1]), 'diff', '--', 'Cache/Requests.lean'], check=True)
+          PY
+
+      - name: Obtain the fixed external caches
+        working-directory: public-source/kernel-candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=10s 900 /usr/bin/time -v lake exe cache get Mathlib.Algebra.BigOperators.Group.Finset.Basic Mathlib.Data.Finset.Card Mathlib.Data.Finset.Union Mathlib.Data.Fintype.Fin Mathlib.Logic.Function.Iterate Mathlib.Order.Preorder.Chain Mathlib.Tactic.FinCases Mathlib.Tactic.NormNum
+          git diff --exit-code HEAD -- lake-manifest.json lean-toolchain lakefile.toml
+          printf '%s\n' 'TRUST: external caches are precompiled inputs, not dependency source rebuilds or independent kernel checks.'
+
+      - name: Compile the candidate serially, then audit all 49 original declarations
+        working-directory: public-source/kernel-candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, re, signal, subprocess, time
+          root = pathlib.Path.cwd()
+          own = ['W04.Poset', 'W04.Rowmotion', 'W04.SmokeLiteral', 'W04.KernelData', 'W04.SmokeData', 'W04.KernelCert.C00', 'W04.KernelCert.C01', 'W04.KernelCert.C02', 'W04.KernelCert.C03', 'W04.KernelCert.C04', 'W04.KernelCert.C05', 'W04.KernelCert.C06', 'W04.KernelCert.C07', 'W04.KernelCert.C08', 'W04.KernelCert.C09', 'W04.KernelCert.C10', 'W04.KernelCert.C11', 'W04.KernelCert.C12', 'W04.KernelCert.C13', 'W04.KernelCert.C14', 'W04.KernelCert.C15', 'W04.KernelCert.C16', 'W04.KernelCert.C17', 'W04.KernelCert.C18', 'W04.KernelCert.C19', 'W04.KernelCert.C20', 'W04.KernelCert.C21', 'W04.KernelCert.C22', 'W04.KernelCert.C23', 'W04.KernelCert.C24', 'W04.KernelCert.C25', 'W04.KernelCert.C26', 'W04.KernelCert.C27', 'W04.KernelCert.C28', 'W04.KernelCert.C29', 'W04.Orbit', 'W04.Main', 'W04', 'Audit']
+          expected_names = ['W04.FLe_refl', 'W04.FLe_trans', 'W04.FLe_antisymm', 'W04.segment_injective', 'W04.FLe_iff_segmentLe', 'W04.segment_chain_certificate', 'W04.segment_maximal_certificate', 'W04.segment_isMaxChain', 'W04.pair_segment_certificate', 'W04.vertex_extension_certificate', 'W04.isMaxChain_iff_segment', 'W04.shared_exact', 'W04.unshared_card_two', 'W04.paper_parameter_three', 'W04.vertex_card', 'W04.segment_card', 'W04.segment_number_odd', 'W04.minComplement_mem_iff', 'W04.minComplement_minimal_iff', 'W04.row_mem_iff', 'W04.row_mem_iff_minimal', 'W04.row_lowerIdeal', 'W04.rho_val', 'W04.orbitData_size', 'W04.orbit_start', 'W04.orbit_lower', 'W04.orbit_step', 'W04.orbitCodeData_size', 'W04.orbit_fingerprint_eq_code', 'W04.orbitCode_injective', 'W04.orbit_injective', 'W04.orbit_sum', 'W04.rho_idealOrbit', 'W04.rho_iterate_val', 'W04.timeIndex_succ', 'W04.iterate_eq_orbit', 'W04.mem_orbitSet_iff', 'W04.orbitSet_lower', 'W04.orbitSet_card', 'W04.orbitSet_sum', 'W04.closed_after_237', 'W04.no_earlier_return', 'W04.rho_period_237', 'W04.rho_no_earlier_return', 'W04.orbitSet_isRowOrbit', 'W04.counterexample', 'W04.not_halfCardinalityHomomesy', 'W04.orbit_mean', 'W04.paper_fence_counterexample']
+          expected = json.loads((root.parent.parent / 'candidate-hashes.json').read_text())
+          output = root / 'fresh-candidate'
+          assert not output.exists()
+          (output / 'lib').mkdir(parents=True)
+          libraries = [output / 'lib']
+          for p in json.loads((root / 'lake-manifest.json').read_text())['packages']:
+              package = root / '.lake/packages' / p['name']
+              assert subprocess.check_output(['git', '-C', str(package), 'rev-parse', 'HEAD'], text=True).strip() == p['rev']
+              status = subprocess.check_output(['git', '-C', str(package), 'status', '--porcelain=v1', '--untracked-files=no'], text=True).strip()
+              assert not status or (p['name'] == 'mathlib' and status == 'M Cache/Requests.lean'), status
+              library = package / '.lake/build/lib/lean'
+              if library.is_dir():
+                  libraries.append(library)
+              else:
+                  assert p['name'] == 'Cli'
+          builtins = pathlib.Path(os.environ['LEAN_SYSROOT']) / 'lib/lean'
+          for library in libraries[1:] + [builtins]:
+              for name in own + ['FreshFenceAudit']:
+                  assert not (library / (name.replace('.', '/') + '.olean')).exists()
+          env = dict(os.environ, LEAN_PATH=os.pathsep.join(map(str, libraries)), LEAN_NUM_THREADS='1')
+          lean = str(pathlib.Path(os.environ['LEAN_SYSROOT']) / 'bin/lean')
+          # Preserve the original Poset source, including its non-fatal style warnings.
+          flags = ['-j', '1', '-s', '131072', '-DElab.async=false']
+          print('LEAN_PATH', env['LEAN_PATH'], flush=True)
+          print('FLAGS', flags, flush=True)
+          print('BUDGET: 6 GiB group RSS, 512 MiB group swap, 2 GiB system available floor, 180 s/module, 1200 s total; no retry.', flush=True)
+          build_start = time.monotonic()
+
+          def available():
+              return int(re.search(r'^MemAvailable:\s+(\d+)', pathlib.Path('/proc/meminfo').read_text(), re.M)[1]) * 1024
+
+          def group_memory(group):
+              rss, swap = 0, 0
+              for directory in pathlib.Path('/proc').iterdir():
+                  if not directory.name.isdigit():
+                      continue
+                  try:
+                      stat = (directory / 'stat').read_text().rsplit(')', 1)[1].split()
+                      if int(stat[2]) != group:
+                          continue
+                      status = (directory / 'status').read_text()
+                      for field, amount in re.findall(r'^(VmRSS|VmSwap):\s+(\d+)', status, re.M):
+                          if field == 'VmRSS': rss += int(amount) * 1024
+                          else: swap += int(amount) * 1024
+                  except (FileNotFoundError, ProcessLookupError):
+                      continue
+              return rss, swap
+
+          def stop(group):
+              try: os.killpg(group, signal.SIGKILL)
+              except ProcessLookupError: pass
+
+          def sha(path):
+              h = hashlib.sha256()
+              with path.open('rb') as stream:
+                  for chunk in iter(lambda: stream.read(1024 * 1024), b''): h.update(chunk)
+              return h.hexdigest()
+
+          def run(args, label, seconds=180):
+              assert available() >= 8 * 1024**3, 'Command preflight failed; stop without retry'
+              assert time.monotonic() - build_start < 1200, 'Total build budget exhausted'
+              log = output / (label + '.log')
+              started = time.monotonic()
+              record = dict(command=args, peak_group_rss=0, peak_group_swap=0, abort_reason=None)
+              print('COMMAND', label, args, flush=True)
+              with log.open('xb') as stream:
+                  process = subprocess.Popen(args, cwd=root, env=env, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+                  try:
+                      while process.poll() is None:
+                          rss, swap = group_memory(process.pid)
+                          record['peak_group_rss'] = max(record['peak_group_rss'], rss)
+                          record['peak_group_swap'] = max(record['peak_group_swap'], swap)
+                          if rss > 6 * 1024**3: record['abort_reason'] = 'group_rss'
+                          elif swap > 512 * 1024**2: record['abort_reason'] = 'group_swap'
+                          elif available() < 2 * 1024**3: record['abort_reason'] = 'system_available'
+                          elif time.monotonic() - started > seconds: record['abort_reason'] = 'command_time'
+                          elif time.monotonic() - build_start > 1200: record['abort_reason'] = 'total_build_time'
+                          if record['abort_reason']:
+                              stop(process.pid)
+                              break
+                          time.sleep(0.5)
+                  finally:
+                      if process.poll() is None: stop(process.pid)
+                      record['exit_code'] = process.wait()
+                      record['elapsed_seconds'] = time.monotonic() - started
+              print(log.read_text(errors='replace'), flush=True)
+              print('RESOURCE_RESULT', label, json.dumps(record, sort_keys=True), flush=True)
+              print('LOG_SHA256', label, sha(log), flush=True)
+              assert record['exit_code'] == 0 and record['abort_reason'] is None, 'Stop; no automatic retry or budget escalation'
+              text = log.read_text(errors='replace')
+              assert not re.search(r"declaration uses ['`]sorry|\bsorryAx\b", text), 'Unfinished declaration'
+              return text
+
+          # Original source first; literal smoke, data smoke, C00..C29, aggregate and unchanged Main next.
+          for name in own:
+              source = root / (name.replace('.', '/') + '.lean')
+              assert sha(source) == expected['kernel-candidate/' + source.relative_to(root).as_posix()]
+              target = output / 'lib' / (name.replace('.', '/') + '.olean')
+              target.parent.mkdir(parents=True, exist_ok=True)
+              run(['/usr/bin/time', '-v', lean] + flags + ['-o', str(target), str(source)], name)
+              assert target.is_file()
+              print('SOURCE_SHA256', name, sha(source), 'OLEAN_SHA256', sha(target), flush=True)
+
+          probe = root / 'FreshFenceAudit.lean'
+          assert not probe.exists()
+          probe.write_text('import W04.Poset\nimport W04.Rowmotion\nimport W04.SmokeLiteral\nimport W04.KernelData\nimport W04.SmokeData\nimport W04.KernelCert.C00\nimport W04.KernelCert.C01\nimport W04.KernelCert.C02\nimport W04.KernelCert.C03\nimport W04.KernelCert.C04\nimport W04.KernelCert.C05\nimport W04.KernelCert.C06\nimport W04.KernelCert.C07\nimport W04.KernelCert.C08\nimport W04.KernelCert.C09\nimport W04.KernelCert.C10\nimport W04.KernelCert.C11\nimport W04.KernelCert.C12\nimport W04.KernelCert.C13\nimport W04.KernelCert.C14\nimport W04.KernelCert.C15\nimport W04.KernelCert.C16\nimport W04.KernelCert.C17\nimport W04.KernelCert.C18\nimport W04.KernelCert.C19\nimport W04.KernelCert.C20\nimport W04.KernelCert.C21\nimport W04.KernelCert.C22\nimport W04.KernelCert.C23\nimport W04.KernelCert.C24\nimport W04.KernelCert.C25\nimport W04.KernelCert.C26\nimport W04.KernelCert.C27\nimport W04.KernelCert.C28\nimport W04.KernelCert.C29\nimport W04.Orbit\nimport W04.Main\nimport W04\nimport Audit\n\nset_option pp.all true\nset_option pp.width 120\n#print W04.Vertex\n#print W04.Segment\n#print W04.lower\n#print W04.FLe\n#print W04.fenceOrder\n#print W04.segment\n#print W04.segmentLe\n#print W04.Shared\n#print W04.unshared\n#print W04.LowerIdeal\n#print W04.LowerIdeals\n#print W04.minComplement\n#print W04.row\n#print W04.rho\n#print W04.orbit\n#print W04.next\n#print W04.orbitSet\n#print W04.IsRowOrbit\n#print W04.HalfCardinalityHomomesy\n#check @W04.FLe_refl\n#print axioms W04.FLe_refl\n#check @W04.FLe_trans\n#print axioms W04.FLe_trans\n#check @W04.FLe_antisymm\n#print axioms W04.FLe_antisymm\n#check @W04.segment_injective\n#print axioms W04.segment_injective\n#check @W04.FLe_iff_segmentLe\n#print axioms W04.FLe_iff_segmentLe\n#check @W04.segment_chain_certificate\n#print axioms W04.segment_chain_certificate\n#check @W04.segment_maximal_certificate\n#print axioms W04.segment_maximal_certificate\n#check @W04.segment_isMaxChain\n#print axioms W04.segment_isMaxChain\n#check @W04.pair_segment_certificate\n#print axioms W04.pair_segment_certificate\n#check @W04.vertex_extension_certificate\n#print axioms W04.vertex_extension_certificate\n#check @W04.isMaxChain_iff_segment\n#print axioms W04.isMaxChain_iff_segment\n#check @W04.shared_exact\n#print axioms W04.shared_exact\n#check @W04.unshared_card_two\n#print axioms W04.unshared_card_two\n#check @W04.paper_parameter_three\n#print axioms W04.paper_parameter_three\n#check @W04.vertex_card\n#print axioms W04.vertex_card\n#check @W04.segment_card\n#print axioms W04.segment_card\n#check @W04.segment_number_odd\n#print axioms W04.segment_number_odd\n#check @W04.minComplement_mem_iff\n#print axioms W04.minComplement_mem_iff\n#check @W04.minComplement_minimal_iff\n#print axioms W04.minComplement_minimal_iff\n#check @W04.row_mem_iff\n#print axioms W04.row_mem_iff\n#check @W04.row_mem_iff_minimal\n#print axioms W04.row_mem_iff_minimal\n#check @W04.row_lowerIdeal\n#print axioms W04.row_lowerIdeal\n#check @W04.rho_val\n#print axioms W04.rho_val\n#check @W04.orbitData_size\n#print axioms W04.orbitData_size\n#check @W04.orbit_start\n#print axioms W04.orbit_start\n#check @W04.orbit_lower\n#print axioms W04.orbit_lower\n#check @W04.orbit_step\n#print axioms W04.orbit_step\n#check @W04.orbitCodeData_size\n#print axioms W04.orbitCodeData_size\n#check @W04.orbit_fingerprint_eq_code\n#print axioms W04.orbit_fingerprint_eq_code\n#check @W04.orbitCode_injective\n#print axioms W04.orbitCode_injective\n#check @W04.orbit_injective\n#print axioms W04.orbit_injective\n#check @W04.orbit_sum\n#print axioms W04.orbit_sum\n#check @W04.rho_idealOrbit\n#print axioms W04.rho_idealOrbit\n#check @W04.rho_iterate_val\n#print axioms W04.rho_iterate_val\n#check @W04.timeIndex_succ\n#print axioms W04.timeIndex_succ\n#check @W04.iterate_eq_orbit\n#print axioms W04.iterate_eq_orbit\n#check @W04.mem_orbitSet_iff\n#print axioms W04.mem_orbitSet_iff\n#check @W04.orbitSet_lower\n#print axioms W04.orbitSet_lower\n#check @W04.orbitSet_card\n#print axioms W04.orbitSet_card\n#check @W04.orbitSet_sum\n#print axioms W04.orbitSet_sum\n#check @W04.closed_after_237\n#print axioms W04.closed_after_237\n#check @W04.no_earlier_return\n#print axioms W04.no_earlier_return\n#check @W04.rho_period_237\n#print axioms W04.rho_period_237\n#check @W04.rho_no_earlier_return\n#print axioms W04.rho_no_earlier_return\n#check @W04.orbitSet_isRowOrbit\n#print axioms W04.orbitSet_isRowOrbit\n#check @W04.counterexample\n#print axioms W04.counterexample\n#check @W04.not_halfCardinalityHomomesy\n#print axioms W04.not_halfCardinalityHomomesy\n#check @W04.orbit_mean\n#print axioms W04.orbit_mean\n#check @W04.paper_fence_counterexample\n#print axioms W04.paper_fence_counterexample\n')
+          print('PROBE_SHA256', sha(probe), flush=True)
+          imports = run([lean, '--deps', str(probe)], 'actual-imports', 60)
+          deps = [pathlib.Path(s.strip()).resolve() for s in imports.splitlines() if s.strip()]
+          for name in own:
+              assert deps.count((output / 'lib' / (name.replace('.', '/') + '.olean')).resolve()) == 1
+          for path in deps:
+              assert path.is_relative_to((output / 'lib').resolve()) or path.is_relative_to(builtins.resolve()), path
+              print('ACTUAL_IMPORT_SHA256', str(path), sha(path), flush=True)
+          text = run(['/usr/bin/time', '-v', lean] + flags + ['-o', str(output / 'lib/FreshFenceAudit.olean'), str(probe)], 'complete-types-axioms')
+          observed = {}
+          for name, axioms in re.findall(r"^'([^']+)' depends on axioms: \[([^\]]*)\]", text, re.M):
+              assert name not in observed
+              observed[name] = [a.strip() for a in axioms.split(',') if a.strip()]
+          for name in re.findall(r"^'([^']+)' does not depend on any axioms", text, re.M):
+              assert name not in observed
+              observed[name] = []
+          assert set(observed) == set(expected_names) and len(observed) == 49
+          assert all(set(a) <= {'propext', 'Classical.choice', 'Quot.sound'} for a in observed.values()), observed
+          for name in expected_names:
+              assert len(re.findall(r'^@?' + re.escape(name) + r'(?:\s|\.{|\(|\{|\[|:)', text, re.M)) == 1, name
+          print('FINAL_AXIOMS_JSON', json.dumps(observed, sort_keys=True), flush=True)
+          assert all(sha(root.parent / p) == h for p, h in expected.items())
+          subprocess.run(['git', 'diff', '--exit-code', 'HEAD', '--'], cwd=root.parent, check=True)
+          print('PASS: candidate modules freshly compiled; all 49 original full types and their transitive axiom reports observed in the final probe.', flush=True)
+          print('SCOPE: 32 vertices, period 237, sum 3774, mean 1258/79; only Conjecture 5.4(b). This does not replace the original release.', flush=True)
+          print('NOT PERFORMED: dependency source rebuild, full dependency replay, independent-kernel check, priority/minimality review.', flush=True)
+          PY
+
+      - name: Final runner resources
+        if: always()
+        shell: bash
+        run: |
+          free -b
+          df -B1 .
